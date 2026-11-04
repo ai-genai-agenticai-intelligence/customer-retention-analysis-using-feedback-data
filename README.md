@@ -1,5 +1,6 @@
 # Customer Feedback Intelligence
-liveDemo - customer-retention-analysis-using-f.vercel.app
+https://customer-retention-analysis-using-f.vercel.app/
+
 Sentiment analysis of restaurant reviews with a Flask interface.
 
 > **Scope note:** the data has only review text and a Liked (1/0) label — no customer IDs, purchase behaviour, churn or retention outcomes. This project classifies **feedback sentiment**; it cannot predict retention or churn. Negative sentiment is a useful *risk signal* to follow up on, not a churn probability.
