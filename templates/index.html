@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101a30">
+    <title>Customer Feedback Intelligence</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #17233c;
+            --muted: #748099;
+            --line: #e8ebf2;
+            --paper: #fff;
+            --canvas: #f5f7fb;
+            --navy: #101a30;
+            --blue: #4667e8;
+            --green: #14876b;
+            --red: #c45058;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: var(--canvas);
+            color: var(--ink);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+            line-height: 1.5;
+        }
+        .topbar {
+            min-height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 0 max(24px, calc((100% - 1180px) / 2));
+            color: white;
+            background: var(--navy);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; font-weight: 720; }
+        .brand-mark {
+            width: 36px; height: 36px; display: grid; place-items: center;
+            border-radius: 11px; background: #27395c; color: #b6c8ff;
+        }
+        .top-label {
+            border: 1px solid #34425e; border-radius: 30px; padding: 7px 12px;
+            color: #cbd4e4; font-size: 12px;
+        }
+        main { width: min(1180px, calc(100% - 40px)); margin: 38px auto 70px; }
+        .eyebrow {
+            color: var(--blue); font-size: 11px; font-weight: 800;
+            letter-spacing: .13em; text-transform: uppercase;
+        }
+        h1 { margin: 9px 0 10px; font-size: clamp(29px, 4vw, 42px); letter-spacing: -.04em; }
+        .intro { max-width: 720px; margin: 0; color: var(--muted); font-size: 15px; }
+        .notice {
+            margin-top: 21px; padding: 12px 15px; border: 1px solid #e8d9ae;
+            border-radius: 10px; color: #775d20; background: #fffaf0; font-size: 13px;
+        }
+        .metrics {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 14px; margin: 25px 0;
+        }
+        .metric, .card {
+            border: 1px solid var(--line); border-radius: 14px; background: var(--paper);
+            box-shadow: 0 5px 22px rgba(27, 44, 80, .035);
+        }
+        .metric { padding: 18px 20px; }
+        .metric-label { color: var(--muted); font-size: 12px; font-weight: 650; }
+        .metric-value { margin-top: 7px; font-size: 28px; font-weight: 760; letter-spacing: -.04em; }
+        .metric-note { color: var(--muted); font-size: 11px; }
+        .columns { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, .8fr); gap: 18px; }
+        .card { padding: 23px; }
+        .card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+        h2 { margin: 0; font-size: 17px; letter-spacing: -.02em; }
+        .subheading { margin: 5px 0 18px; color: var(--muted); font-size: 12px; }
+        .tag { border-radius: 20px; padding: 5px 9px; color: #506082; background: #f0f3fa; font-size: 10px; font-weight: 750; white-space: nowrap; }
+        label { display: block; margin: 0 0 7px; font-size: 12px; font-weight: 700; }
+        textarea {
+            display: block; width: 100%; min-height: 128px; padding: 12px 13px;
+            resize: vertical; border: 1px solid #dfe4ee; border-radius: 10px;
+            outline: none; background: #fcfdff; color: var(--ink); font: inherit; font-size: 13px;
+        }
+        textarea:focus { border-color: #8398f5; box-shadow: 0 0 0 3px #4667e81b; }
+        button {
+            margin-top: 12px; padding: 10px 15px; border: 0; border-radius: 8px;
+            color: white; background: var(--blue); font: inherit; font-size: 12px;
+            font-weight: 700; cursor: pointer;
+        }
+        button:hover { background: #3555d4; }
+        .form-foot { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+        .result {
+            margin-top: 16px; padding: 14px; border-radius: 10px;
+            background: #f1f8f6; border: 1px solid #d7eee6;
+        }
+        .result.negative { background: #fff5f5; border-color: #f3dddd; }
+        .result-title { color: var(--green); font-size: 14px; font-weight: 750; }
+        .negative .result-title { color: var(--red); }
+        .result-copy { margin-top: 4px; color: #5f6c80; font-size: 12px; }
+        .meter { height: 6px; margin-top: 12px; overflow: hidden; border-radius: 10px; background: #e5e9f1; }
+        .meter-fill { height: 100%; border-radius: inherit; background: var(--green); }
+        .negative .meter-fill { background: var(--red); }
+        .error { margin: 0 0 17px; padding: 12px 14px; border-radius: 9px; color: #8e353a; background: #fff0f0; font-size: 13px; }
+        .batch-card { margin-top: 18px; }
+        .batch-textarea { min-height: 120px; }
+        .table-wrap { margin-top: 18px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 12px; }
+        th { padding: 9px; color: var(--muted); font-size: 10px; letter-spacing: .04em; text-transform: uppercase; }
+        td { padding: 11px 9px; border-top: 1px solid var(--line); }
+        .review-cell { max-width: 640px; color: #4a5870; }
+        .pill { border-radius: 20px; padding: 4px 8px; font-size: 10px; font-weight: 750; }
+        .pill.positive { color: #11765f; background: #e8f6f1; }
+        .pill.negative { color: #ac4148; background: #fff0f0; }
+        .footnote { margin: 19px 2px 0; color: var(--muted); font-size: 11px; }
+        @media (max-width: 760px) {
+            .topbar { padding: 0 18px; }
+            .top-label { display: none; }
+            main { width: min(100% - 28px, 600px); margin-top: 27px; }
+            .metrics { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .metric { padding: 15px; }
+            .metric-value { font-size: 24px; }
+            .columns { grid-template-columns: 1fr; }
+            .card { padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">✦</span> Feedback Intelligence</div>
+        <span class="top-label">BEHAVIORAL SIGNALS · SENTIMENT ANALYSIS</span>
+    </header>
+    <main>
+        <div class="eyebrow">Customer retention · Voice of customer</div>
+        <h1>Understand how customers feel.</h1>
+        <p class="intro">Explore the feedback dataset and classify individual or multiple customer reviews with the saved sentiment model.</p>
+        <div class="notice"><strong>Model scope:</strong> The included artifact predicts positive/negative review sentiment. It does not predict customer churn, repeat purchase, or retention outcomes; sentiment is shown as a feedback signal only.</div>
+
+        <section class="metrics" aria-label="Dataset summary">
+            <div class="metric"><div class="metric-label">Reviews in dataset</div><div class="metric-value">{{ "{:,}".format(total_reviews) }}</div><div class="metric-note">Restaurant review records</div></div>
+            <div class="metric"><div class="metric-label">Positive feedback</div><div class="metric-value">{{ "{:,}".format(positive_count) }}</div><div class="metric-note">Labeled as liked</div></div>
+            <div class="metric"><div class="metric-label">Negative feedback</div><div class="metric-value">{{ "{:,}".format(negative_count) }}</div><div class="metric-note">Labeled as not liked</div></div>
+            <div class="metric"><div class="metric-label">Positive share</div><div class="metric-value">{{ positive_rate }}%</div><div class="metric-note">Observed labels, not a retention rate</div></div>
+        </section>
+
+        {% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+
+        <div class="columns">
+            <section class="card">
+                <div class="card-heading">
+                    <div><h2>Analyze a review</h2><p class="subheading">Estimate whether the feedback reads as positive or negative.</p></div>
+                    <span class="tag">SINGLE REVIEW</span>
+                </div>
+                <form method="post">
+                    <input type="hidden" name="action" value="single">
+                    <label for="review">Customer feedback</label>
+                    <textarea id="review" name="review" maxlength="2000" placeholder="Paste a customer review...">{{ single_review|default("") }}</textarea>
+                    <button type="submit">Analyze sentiment <span aria-hidden="true">→</span></button>
+                    <p class="form-foot">English text · Up to 2,000 characters</p>
+                </form>
+                {% if single_result %}
+                <div class="result {{ 'negative' if not single_result.liked else '' }}" aria-live="polite">
+                    <div class="result-title">{{ "Positive feedback" if single_result.liked else "Negative feedback" }}</div>
+                    <div class="result-copy">Top-class probability: {{ "%.0f"|format(single_result.confidence * 100) }}% · Positive probability: {{ "%.0f"|format(single_result.positive_probability * 100) }}%</div>
+                    <div class="meter" role="img" aria-label="Positive probability {{ "%.0f"|format(single_result.positive_probability * 100) }} percent">
+                        <div class="meter-fill" style="width: {{ (single_result.positive_probability * 100)|round|int }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+
+            <section class="card">
+                <div class="card-heading">
+                    <div><h2>Feedback snapshot</h2><p class="subheading">What the model can support today.</p></div>
+                    <span class="tag">MODEL SCOPE</span>
+                </div>
+                <div class="metric-label">Target label</div>
+                <p style="margin:5px 0 16px;font-size:14px;font-weight:700">Liked / not liked</p>
+                <div class="metric-label">Model</div>
+                <p style="margin:5px 0 16px;font-size:14px;font-weight:700">TF-IDF (word + char n-grams) + Logistic Regression</p>
+                <div class="metric-label">Held-out test accuracy</div>
+                <p style="margin:5px 0 16px;font-size:14px;font-weight:700">84.5% <span style="font-size:11px;font-weight:500;color:#748099">(200 reviews)</span></p>
+                <div class="metric-label">Source</div>
+                <p style="margin:5px 0 0;font-size:13px">Restaurant_Reviews.tsv · {{ "{:,}".format(total_reviews) }} labeled reviews</p>
+                <p class="footnote">No customer IDs, purchase history, or retention labels are included in this project dataset.</p>
+            </section>
+        </div>
+
+        <section class="card batch-card">
+            <div class="card-heading">
+                <div><h2>Analyze a feedback batch</h2><p class="subheading">Paste one review per line to classify a set of customer comments.</p></div>
+                <span class="tag">UP TO 100 REVIEWS</span>
+            </div>
+            <form method="post">
+                <input type="hidden" name="action" value="batch">
+                <label for="reviews">Reviews</label>
+                <textarea class="batch-textarea" id="reviews" name="reviews" maxlength="220000" placeholder="The service was wonderful.&#10;The food arrived cold and late.">{{ batch_reviews|default("") }}</textarea>
+                <button type="submit">Analyze batch <span aria-hidden="true">→</span></button>
+            </form>
+            {% if batch_results is not none %}
+            <div class="metrics" style="grid-template-columns:repeat(2,minmax(0,1fr));margin:18px 0 0">
+                <div class="metric"><div class="metric-label">Positive predictions</div><div class="metric-value">{{ batch_positive_count }}</div></div>
+                <div class="metric"><div class="metric-label">Negative predictions</div><div class="metric-value">{{ batch_negative_count }}</div></div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Feedback</th><th>Sentiment</th><th>Top-class probability</th><th>Positive probability</th></tr></thead>
+                    <tbody>
+                    {% for result in batch_results %}
+                    <tr>
+                        <td class="review-cell">{{ result.review }}</td>
+                        <td><span class="pill {{ 'positive' if result.liked else 'negative' }}">{{ "Positive" if result.liked else "Negative" }}</span></td>
+                        <td>{{ "%.0f"|format(result.confidence * 100) }}%</td>
+                        <td>{{ "%.0f"|format(result.positive_probability * 100) }}%</td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </section>
+        <p class="footnote">The saved model scored 84.5% on a 200-review held-out test (about 82% cross-validated). Displayed probabilities are not calibrated. Predictions are estimates, not guarantees of customer behavior; review them before making decisions.</p>
+    </main>
+</body>
+</html>

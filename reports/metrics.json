@@ -1,0 +1,9 @@
+{
+  "train_accuracy": 1.0,
+  "cv_accuracy_mean": 0.8158,
+  "cv_accuracy_std": 0.0276,
+  "test_accuracy": 0.845,
+  "test_roc_auc": 0.9136,
+  "n_train": 796,
+  "n_test": 200
+}
